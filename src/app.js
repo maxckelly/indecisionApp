@@ -1,59 +1,74 @@
 console.log("App.js is running")
 
-const todo = {
+const optionsObject = {
   title: 'Star Wars',
   subtitle: 'The Sith',
-  options: ['One', 'Two']
+  options: []
 }
 
-function todoArray(todo) {
-  if (todo.options.length > 0) {
-    return `Here are your options: ${todo.options}`
+function todoArray(optionsObject) {
+  if (optionsObject.options.length > 0) {
+    return `Here are your options: ${optionsObject.options}`
   } else {
-    return "No options avaliable"
+    return "No options available"
   }
+};
+
+
+const onFormSubmit = (event) => {
+  event.preventDefault();
+  
+  // The below is collecting the value that the user enters into the input field
+  const userInputValue = event.target.elements.option.value;
+
+  if (userInputValue) {
+    // The below pushes the input value to the options array in optionsObject
+    optionsObject.options.push(userInputValue);
+
+    // The below resets the input value to an empty string
+    event.target.elements.option.value = '';
+    
+    // The below re renders the app
+    renderApp();
+  }
+};
+
+// The below function removes everything from the options array in optionsObject
+const removeAll = () => {
+
+  // The below removes all the items from the arrays
+  optionsObject.options = [];
+
+  // The below re renders the app
+  renderApp();
 }
 
-// JSX - JavaScript XML Syntax extension
-let template = (
-  <div>
-    <h1>To do list</h1>
-    <h3> {todo.title}</h3>
-      <ul>{todo.subtitle ? todo.subtitle : "No subtitle added"}</ul>
-      <ul>{todoArray(todo)}</ul>
-  </div>
-);
+const appRoot = document.getElementById("app");
 
-const users = {
-  name: 'Max',
-  age: 22,
-  location: 'Melbourne, Victoria, Australia'
+// The below is a way of rendering React without components 
+const renderApp = () => {
+  let template = (
+    <div>
+      <h3> {optionsObject.title}</h3>
+
+      <ul>{optionsObject.length > 0 ? 'Here are your options' : "No options"}</ul>
+
+      <p> {optionsObject.options.length}</p>
+
+      <button onClick={removeAll}> Remove All Options </button>
+      <ul>
+        {todoArray(optionsObject)}
+      </ul>
+
+      {/* You do not want to call onFormSubmit() function as it will return undefined  */}
+      <form onSubmit={onFormSubmit}>
+        <input type="text" name="option" />
+        <button> Add Option </button>
+      </form>
+    </div>
+  );
+
+  ReactDOM.render(template, appRoot);
 };
 
-function userLocation(location) {
-  if (location) {
-    return <p> Location: {location}</p>
-  }
-};
-
-const templateTwo = (
-  <div>
-    {/* The below renders Anonymous if no name */}
-    <h1> Name: {users.name ? users.name : "Anonymous"} </h1>
-    { (users.age && users.age >= 18) && (<p> Age: {users.age}</p>) }
-    {userLocation(users.location)}
-  </div>
-);
-
-let count = 0;
-const templateThree = (
-  <div>
-    <h1> Count: {count}</h1>
-    <button id="my-id" className="button"> +1 </button>
-  </div>
-);
-
-
-let appRoot = document.getElementById("app");
-
-ReactDOM.render(templateThree, appRoot);
+renderApp();

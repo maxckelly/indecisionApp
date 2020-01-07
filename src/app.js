@@ -1,74 +1,77 @@
-console.log("App.js is running")
+class IndecisionApp extends React.Component {
+  render() {
 
-const optionsObject = {
-  title: 'Star Wars',
-  subtitle: 'The Sith',
-  options: []
+    // The below consts define the data which is then passed in classes like Header and Options
+    const title = 'Indecision';
+    const subtitle = 'Put your life in the hands of a computer';
+    const options = ['Thing one ', 'Thing two ', 'Thing three '];
+
+    return (
+      <div>
+        <Header title={title} subtitle={subtitle}/>
+        <Action />
+        <Options options={options} />
+        <AddOption />
+      </div>
+    )
+  }
 }
 
-function todoArray(optionsObject) {
-  if (optionsObject.options.length > 0) {
-    return `Here are your options: ${optionsObject.options}`
-  } else {
-    return "No options available"
+class Header extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1> {this.props.title}    </h1>
+        <h3> {this.props.subtitle} </h3>
+      </div>
+    )
   }
 };
 
-
-const onFormSubmit = (event) => {
-  event.preventDefault();
-  
-  // The below is collecting the value that the user enters into the input field
-  const userInputValue = event.target.elements.option.value;
-
-  if (userInputValue) {
-    // The below pushes the input value to the options array in optionsObject
-    optionsObject.options.push(userInputValue);
-
-    // The below resets the input value to an empty string
-    event.target.elements.option.value = '';
-    
-    // The below re renders the app
-    renderApp();
+class Action extends React.Component {
+  render() {
+    return (
+      <div>
+        <button> What should I do? </button>
+      </div>
+    )
   }
 };
 
-// The below function removes everything from the options array in optionsObject
-const removeAll = () => {
-
-  // The below removes all the items from the arrays
-  optionsObject.options = [];
-
-  // The below re renders the app
-  renderApp();
-}
-
-const appRoot = document.getElementById("app");
-
-// The below is a way of rendering React without components 
-const renderApp = () => {
-  let template = (
-    <div>
-      <h3> {optionsObject.title}</h3>
-
-      <ul>{optionsObject.length > 0 ? 'Here are your options' : "No options"}</ul>
-
-      <p> {optionsObject.options.length}</p>
-
-      <button onClick={removeAll}> Remove All Options </button>
-      <ul>
-        {todoArray(optionsObject)}
-      </ul>
-
-      {/* You do not want to call onFormSubmit() function as it will return undefined  */}
-      <form onSubmit={onFormSubmit}>
-        <input type="text" name="option" />
-        <button> Add Option </button>
-      </form>
-    </div>
-  );
-
-  ReactDOM.render(template, appRoot);
+class Options extends React.Component {
+  render() {
+    return (
+      <div>
+        {
+          this.props.options.map((option) => <Option key={option} optionText={option}/>)
+        } 
+        {/* This is a nested component */}
+        <Option />
+      </div>
+    )
+  }
 };
 
-renderApp();
+// Setup an options prop for the Options component
+// Render the length of the array
+class Option extends React.Component {
+  render() {
+    return (
+      <div>
+        {this.props.optionText}
+      </div>
+    )
+  }
+}
+
+class AddOption extends React.Component {
+  render() {
+    return (
+      <div>
+        <p> Option form goes here </p>
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<IndecisionApp />, document.getElementById('app'));

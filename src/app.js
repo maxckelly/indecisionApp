@@ -29,16 +29,26 @@ class Header extends React.Component {
 };
 
 class Action extends React.Component {
+
+  handlePick() {
+    alert('Hanlde Pick')
+  };
+
   render() {
     return (
       <div>
-        <button> What should I do? </button>
+        <button onClick={this.handlePick}> What should I do? </button>
       </div>
     )
   }
 };
 
 class Options extends React.Component {
+
+  handleRemoveAll () {
+    alert('Remove All')
+  };
+
   render() {
     return (
       <div>
@@ -47,6 +57,7 @@ class Options extends React.Component {
         } 
         {/* This is a nested component */}
         <Option />
+        <button onClick={this.handleRemoveAll}> Remove All </button>
       </div>
     )
   }
@@ -65,10 +76,25 @@ class Option extends React.Component {
 }
 
 class AddOption extends React.Component {
+
+  handleAddOption (event) {
+    event.preventDefault();
+
+    const userInputValue = event.target.elements.option.value.trim();
+
+    if (userInputValue) {
+      alert(userInputValue)
+    };
+  }
+  
   render() {
     return (
       <div>
         <p> Option form goes here </p>
+        <form onSubmit={this.handleAddOption}>
+          <input type="text" name="option" />
+          <button> Submit </button>
+        </form>
       </div>
     )
   }

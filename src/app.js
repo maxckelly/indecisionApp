@@ -1,3 +1,4 @@
+
 class IndecisionApp extends React.Component {
   render() {
 
@@ -45,8 +46,15 @@ class Action extends React.Component {
 
 class Options extends React.Component {
 
+  constructor (props) {
+    super(props);
+    // The below allows us to access state in functions. The .bind() is the key
+    this.handleRemoveAll = this.handleRemoveAll.bind
+  }
+
   handleRemoveAll () {
-    alert('Remove All')
+    // alert('Remove All')
+    console.log(this.props.options)
   };
 
   render() {

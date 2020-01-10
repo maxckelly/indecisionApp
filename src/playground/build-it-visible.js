@@ -1,6 +1,3 @@
-// Visibility Toggle - render, constructor, handletogglevisibility
-// visibility => false
-
 class Visibility extends React.Component {
 
   constructor (props) {

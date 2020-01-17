@@ -6,18 +6,47 @@ class IndecisionApp extends React.Component {
     this.handleDeleteOptions = this.handleDeleteOptions.bind(this);
     this.handlePick = this.handlePick.bind(this);
     this.handleAddOption = this.handleAddOption.bind(this);
+    this.handleDeleteOption = this.handleDeleteOption.bind(this);
 
     this.state = {
+      // Passes the default array
       options: []
     }
   };
 
-  handleDeleteOptions () {
-    this.setState(() => {
-      return {
-        options: []
+  // The below is getting the data from local storage.
+  componentDidMount() {
+
+    try {
+      // The below is getting the items from local storage and loading them in.
+      const json = localStorage.getItem('options');
+      const options = JSON.parse(json);
+
+      if (options) {
+        this.setState(() => ({ options: options }))
       }
-    })
+    } catch(err) {
+
+    }
+
+  };
+
+  // The below is saving the items to local storage after every action.
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.options.length !== this.state.options.length) {
+      const json = JSON.stringify(this.state.options);
+      localStorage.setItem('options', json)
+    }
+  };
+
+  handleDeleteOptions () {
+    this.setState(() => ({ options: [] }));
+  };
+
+  handleDeleteOption(optionToRemove) {
+    this.setState((prevState) => ({
+      options: prevState.options.filter((option) => optionToRemove !== option)
+    }))
   };
 
   handlePick () {
@@ -27,7 +56,6 @@ class IndecisionApp extends React.Component {
   };
 
   handleAddOption (option) {
-
     // Below is if option field is empty return the error
     if (!option) {
       return 'Enter valid value to add item';
@@ -36,22 +64,19 @@ class IndecisionApp extends React.Component {
       return 'This option already exists';
     } 
 
-    this.setState((prevState) => {
-      return {
-        // Below adds a new array with the new option
-        options: prevState.options.concat(option)
-      }
-    })
+    // Below adds a new array with the new option
+    this.setState((prevState) => ({ 
+      options: prevState.options.concat(option)
+    }));
   };
 
   render() {
 
-    const title = 'Indecision';
     const subtitle = 'Put your life in the hands of a computer';
 
     return (
       <div>
-        <Header title={title} subtitle={subtitle}/>
+        <Header />
         <Action 
           hasOptions={this.state.options.length > 0} 
           handlePick={this.handlePick}
@@ -59,6 +84,7 @@ class IndecisionApp extends React.Component {
         <Options 
           options={this.state.options} 
           handleDeleteOptions={this.handleDeleteOptions}
+          handleDeleteOption={this.handleDeleteOption}
           />
         <AddOption 
           handleAddOption={this.handleAddOption}
@@ -68,60 +94,70 @@ class IndecisionApp extends React.Component {
   }
 };
 
-class Header extends React.Component {
+const Header = (props) => {
+  return (
+    <div>
+      <h1> {props.title}    </h1>
+      {props.subTitle && <h3> {props.subTitle} </h3>}
+    </div>
+  )
+}
 
-  render() {
-    return (
-      <div>
-        <h1> {this.props.title}    </h1>
-        <h3> {this.props.subtitle} </h3>
-      </div>
-    )
-  }
-};
+// The below sets a default title to the header if its not defined
+Header.defaultProps = {
+  title: 'Indecision',
+  subTitle: 'Put your life in the hands of a computer'
+}
 
-class Action extends React.Component {
-
-  render() {
-    return (
-      <div>
-        <button  
-          onClick={this.props.handlePick}
-          disabled={!this.props.hasOptions}
-        > 
-        What should I do? 
+// Stateless function component
+const Action = (props) => {
+  return (
+    <div>
+      <button
+        onClick={props.handlePick}
+        disabled={!props.hasOptions}
+      >
+        What should I do?
         </button>
-      </div>
-    )
-  }
+    </div>
+  )
 };
 
-class Options extends React.Component {
-
-  render() {
-    return (
-      <div>
-        {
-          this.props.options.map((option) => <Option key={option} optionText={option}/>)
-        } 
-        {/* This is a nested component */}
-        <Option />
-        <button onClick={this.props.handleDeleteOptions}> Remove All </button>
-      </div>
-    )
-  }
+const Options = (props) => {
+  return (
+    <div>
+      {props.options.length === 0 && <p> Please add an option </p>}
+      {
+        props.options.map((option) => (
+          <Option 
+            key={option} 
+            optionText={option} 
+            handleDeleteOption={props.handleDeleteOption}
+          />
+        ))
+      }
+      {/* This is a nested component */}
+      <Option />
+      <button onClick={props.handleDeleteOptions}> Remove All </button>
+    </div>
+  )
 };
 
 // Setup an options prop for the Options component
 // Render the length of the array
-class Option extends React.Component {
-  render() {
-    return (
-      <div>
-        {this.props.optionText}
-      </div>
-    )
-  }
+const Option = (props) => {
+  return (
+    <div>
+      {props.optionText}
+      <button 
+        onClick={(e) => {
+          props.handleDeleteOption(props.optionText)
+        }}  
+       > 
+        Remove 
+      </button>
+    </div>
+  )
 }
 
 class AddOption extends React.Component {
@@ -141,11 +177,11 @@ class AddOption extends React.Component {
     const option = event.target.elements.option.value.trim();
     const error = this.props.handleAddOption(option);
 
-    this.setState(() => {
-      return {
-        error: error
-      };
-    })
+    this.setState(() => ({ error: error}));
+
+    if (!error) {
+      event.target.elements.option.value = '';
+    }
   };
   
   render() {
